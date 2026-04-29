@@ -6,8 +6,23 @@ const connectDB = require('./config/db');
 const app = express();
 connectDB();
 
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
-app.use(express.json());
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://smart-dairy-management-system.netlify.app'
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps, curl)
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true
+  })
+);app.use(express.json());
 
 // Routes
 app.use('/api/auth',   require('./routes/auth'));
